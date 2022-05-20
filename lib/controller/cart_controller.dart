@@ -1,14 +1,13 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get.dart';
-import 'package:http/http.dart' as http;
-import 'package:stripe_payment/Utils/stripe_keys.dart';
+import 'package:stripe_payment/blocs/stripe_payment.dart';
 import 'package:stripe_payment/model/catalog_model.dart';
 import 'package:stripe_payment/widgets/snackbar_widget.dart';
 
 class CartController extends GetxController {
+  StripePaymentBloc stripePaymentBloc = StripePaymentBloc();
+
   final items = <Item>[].obs;
 
   var isProgress = false.obs;
@@ -34,16 +33,23 @@ class CartController extends GetxController {
   }
 
   Future<void> makePayment() async {
-    /// call Payment intent api
-    isProgress(true);
-    paymentIntentData = await callPaymentIntent(totalPrice.toString(), 'USD');
-    isProgress(false);
+    try {
+      /// call Payment intent api
+      isProgress(true);
+      paymentIntentData = await stripePaymentBloc.callPaymentIntent(
+        calculateAmount(totalPrice.toString()),
+        'USD',
+      );
+      isProgress(false);
 
-    /// Payment sheet initialization
-    await initPaymentSheet();
+      /// Payment sheet initialization
+      await initPaymentSheet();
 
-    /// Now finally display payment sheet
-    await displayPaymentSheet();
+      /// Now finally display payment sheet
+      await displayPaymentSheet();
+    } catch (e) {
+      print('Exception : ' + e.toString());
+    }
   }
 
   Future<void> initPaymentSheet() async {
@@ -75,40 +81,18 @@ class CartController extends GetxController {
       await Stripe.instance.presentPaymentSheet().then((newValue) {
         showSnackBar("Success", "Payment Successfully");
         clearList();
-        paymentIntentData = null;
-
         print('payment intent ===> ' + paymentIntentData!['id'].toString());
+
+        paymentIntentData = null;
       }).onError((error, stackTrace) {
-        print('Exception ==> $error $stackTrace');
-        showSnackBar("Cancel", "Payment canceled");
+        print('Exception onError ==> $error $stackTrace');
+        // showSnackBar("Cancel", "Payment canceled");
       });
     } on StripeException catch (e) {
       print('Exception ==> $e');
       showSnackBar("Exception", "Payment failed");
     } catch (e) {
       print('$e');
-    }
-  }
-
-  callPaymentIntent(String amount, String currency) async {
-    try {
-      Map<String, dynamic> body = {
-        'amount': calculateAmount(amount),
-        'currency': currency,
-        'payment_method_types[]': 'card'
-      };
-
-      var response = await http.post(
-          Uri.parse('https://api.stripe.com/v1/payment_intents'),
-          body: body,
-          headers: {
-            'Authorization': 'Bearer $secretKey',
-            'Content-Type': 'application/x-www-form-urlencoded'
-          });
-      print('Create Intent response ===> ${response.body.toString()}');
-      return jsonDecode(response.body);
-    } catch (e) {
-      print('Exception ===> ' + e.toString());
     }
   }
 

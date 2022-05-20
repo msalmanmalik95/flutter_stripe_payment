@@ -85,31 +85,34 @@ class _CartTotal extends StatelessWidget {
                   Text('\$${value.totalPrice}', style: hugeStyle),
             ),
             const SizedBox(width: 24),
-            // TextButton(
-            //   onPressed: () async {
-            //     await ctrl.makePayment();
-            //   },
-            //   style: TextButton.styleFrom(primary: Colors.white),
-            //   child: const Text('BUY'),
-            // ),
             SizedBox(
               height: 50,
-              child: ElevatedButton(
-                style: ButtonStyle(
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ))),
-                onPressed: () async {
-                  await ctrl.makePayment();
-                },
-                child: Obx(() => ctrl.isProgress.value
-                    ? const CircularProgressIndicator(
+              child: Obx(() => ctrl.isProgress.value
+                  ? ElevatedButton(
+                      style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ))),
+                      onPressed: null,
+                      child: const CircularProgressIndicator(
                         backgroundColor: Colors.white,
                         strokeWidth: 2,
-                      )
-                    : const Text('Buy')),
-              ),
+                      ),
+                    )
+                  : ElevatedButton(
+                      style: ButtonStyle(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0),
+                      ))),
+                      onPressed: () async {
+                        await ctrl.makePayment();
+                      },
+                      child: const Text('Buy'),
+                    )),
             )
           ],
         ),
