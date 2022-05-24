@@ -35,12 +35,7 @@ class CartController extends GetxController {
   Future<void> makePayment() async {
     try {
       /// call Payment intent api
-      isProgress(true);
-      paymentIntentData = await stripePaymentBloc.callPaymentIntent(
-        calculateAmount(totalPrice.toString()),
-        'USD',
-      );
-      isProgress(false);
+      await callPaymentIntentAPI(price: totalPrice.toString());
 
       /// Payment sheet initialization
       await initPaymentSheet();
@@ -52,13 +47,21 @@ class CartController extends GetxController {
     }
   }
 
-  Future<void> initPaymentSheet() async {
+  Future<void> callPaymentIntentAPI({required String price}) async {
+    isProgress(true);
+    paymentIntentData = await stripePaymentBloc.callPaymentIntent(
+      calculateAmount(price),
+      'USD',
+    );
+    isProgress(false);
+  }
+
+  Future<String> initPaymentSheet() async {
     try {
-      await Stripe.instance
+      return await Stripe.instance
           .initPaymentSheet(
               paymentSheetParameters: SetupPaymentSheetParameters(
-                  paymentIntentClientSecret:
-                      paymentIntentData!['client_secret'],
+                  paymentIntentClientSecret: paymentIntentData!['client_secret'],
                   applePay: true,
                   googlePay: true,
                   testEnv: true,
@@ -68,11 +71,14 @@ class CartController extends GetxController {
                   merchantDisplayName: 'Salman'))
           .then((value) {
         print("Success initPaymentSheet ");
+        return 'Success';
       }).onError((error, stackTrace) {
         print("Error initPaymentSheet " + error.toString());
+        return 'Error';
       });
     } catch (e) {
       print('Exception : ' + e.toString());
+      return 'Exception';
     }
   }
 

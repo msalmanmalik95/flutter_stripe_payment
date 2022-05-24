@@ -3,6 +3,7 @@ import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:stripe_payment/screens/cart_screen.dart';
 import 'package:stripe_payment/screens/catalog_screen.dart';
+import 'package:stripe_payment/screens/home_screen.dart';
 
 import 'Utils/stripe_keys.dart';
 
@@ -26,8 +27,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/catalog',
+      initialRoute: '/home',
       routes: {
+        '/home': (context) => const HomeScreen(),
         '/catalog': (context) => const CatalogScreen(),
         '/cart': (context) => const CartScreen(),
       },

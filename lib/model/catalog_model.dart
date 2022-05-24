@@ -28,7 +28,7 @@ class CatalogController extends GetxController {
     'Currying',
   ];
 
-  Item getById(int id) => Item(id, itemNames[id % itemNames.length]);
+  Item getById(int id) => Item(id: id, name: itemNames[id % itemNames.length]);
 
   Item getByPosition(int position) {
     return getById(position);
@@ -48,9 +48,9 @@ class Item {
   final int id;
   final String name;
   final Color color;
-  final int price = 42;
+  int price = 42;
 
-  Item(this.id, this.name)
+  Item({required this.id, required this.name, this.price = 42})
       : color = Colors.primaries[id % Colors.primaries.length];
 
   @override

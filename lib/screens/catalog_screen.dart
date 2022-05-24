@@ -19,7 +19,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Catalog', style: Theme.of(context).textTheme.headline5),
+        title: const Text('Catalog'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 20.0),
